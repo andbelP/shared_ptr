@@ -3,10 +3,23 @@
 #include "control_block.hpp"
 #include <utility>
 
+template<typename T>
+class weak_ptr;
+
 template <typename T>
 class shared_ptr {
     T* data_{};
     ControlBlock* cblock_{};
+
+
+    template<typename U>
+    friend class weak_ptr;
+
+    template<typename U>
+    friend class shared_ptr;
+
+    template<typename U>
+    shared_ptr(const weak_ptr<U>& ptr);
 
    public:
 
@@ -17,7 +30,8 @@ class shared_ptr {
 
     shared_ptr() = default;
 
-    shared_ptr(T* data){
+    template<typename U>
+    shared_ptr(U* data){
         if(!data){
             return;
         }
@@ -37,7 +51,24 @@ class shared_ptr {
         }
     }
 
+    template<typename U>
+    shared_ptr(const shared_ptr<U>& ptr){
+        data_=ptr.data_;
+        cblock_=ptr.cblock_;
+
+        if(cblock_){
+            cblock_->IncreaseStrong();
+        }
+    }
+
     shared_ptr& operator=(const shared_ptr& ptr){
+        shared_ptr tmp = ptr;
+        swap(tmp);
+        return *this;
+    }
+
+    template<typename U>
+    shared_ptr& operator=(const shared_ptr<U>& ptr){
         shared_ptr tmp = ptr;
         swap(tmp);
         return *this;
