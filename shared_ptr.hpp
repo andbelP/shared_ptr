@@ -18,9 +18,6 @@ class shared_ptr {
     template <typename U>
     friend class shared_ptr;
 
-    template <typename U>
-    shared_ptr(const weak_ptr<U>& ptr);
-
    public:
     void swap(shared_ptr& other) noexcept;
 
@@ -32,6 +29,9 @@ class shared_ptr {
     shared_ptr(std::nullptr_t);
 
     shared_ptr(const shared_ptr& ptr);
+
+    template <typename U>
+    shared_ptr(const weak_ptr<U>& ptr);
 
     template <typename U>
     shared_ptr(const shared_ptr<U>& ptr);
@@ -71,7 +71,7 @@ shared_ptr<T>::shared_ptr(U* data) {
     }
 
     data_ = data;
-    cblock_ = new TypedControlBlock<T>{1, 0, data_};
+    cblock_ = new TypedControlBlock<U>{1, 0, data};
 }
 
 template <typename T>

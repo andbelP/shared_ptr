@@ -54,11 +54,13 @@ class weak_ptr {
 
     void reset() noexcept;
 
-    shared_ptr<T> lock();
+    shared_ptr<T> lock() const noexcept;
 
     bool expired() const;
 
     long use_count() const noexcept;
+
+    ~weak_ptr();
 
 };
 
@@ -90,7 +92,7 @@ weak_ptr<T>::weak_ptr(const shared_ptr<T>& ptr) {
 }
 
 template <typename T>
-shared_ptr<T> weak_ptr<T>::lock() {
+shared_ptr<T> weak_ptr<T>::lock() const noexcept {
     if (expired()) {
         return shared_ptr<T>{};
     }
@@ -99,7 +101,7 @@ shared_ptr<T> weak_ptr<T>::lock() {
 
 template <typename T>
 bool weak_ptr<T>::expired() const {
-    return !cblock_ || cblock_->strong_cnt > 0;
+    return !cblock_ || cblock_->strong_cnt == 0;
 }
 
 template <typename T>
@@ -159,5 +161,13 @@ weak_ptr<T>::weak_ptr(const weak_ptr<U>& ptr) {
 
     if (cblock_) {
         cblock_->IncreaseWeak();
+    }
+}
+
+
+template <typename T>
+weak_ptr<T>::~weak_ptr() {
+    if(cblock_){
+        cblock_->DecreaseWeak();
     }
 }
