@@ -1,5 +1,7 @@
 #pragma once
 
+#include <type_traits>
+
 #include "control_block.hpp"
 #include "default_deleter.hpp"
 
@@ -9,7 +11,12 @@ class SharedPtr {
     T* data_{};
     ControlBlock* cblock_{};
 
+    template<typename U>
+    friend class SharedPtr;
+
 public:
+
+    using element_type = std::remove_extent_t<T>;
 
     T* get() {
         return data_;
@@ -46,27 +53,50 @@ public:
         swap(tmp);
     }
 
-    SharedPtr(const SharedPtr& other){
+    template<typename U, typename Deleter>
+    void reset(U* ptr, Deleter dltr) noexcept {
+        SharedPtr tmp(ptr, dltr);
+        swap(tmp);
+    }
+
+    SharedPtr(const SharedPtr& other) : data_(other.data_), cblock_(other.cblock_) {
         if(!other.cblock_){
             return;
         }
 
-        cblock_=other.cblock_;
-        data_=other.data_;
+        cblock_->IncreaseStrong();
+
+        assert(cblock_->GetStrongCounter() >= 2);
+    }
+
+    template<typename U>
+    SharedPtr(const SharedPtr<U>& other) : data_(other.data_), cblock_(other.cblock_) {
+        if(!other.cblock_){
+            return;
+        }
+
         cblock_->IncreaseStrong();
 
         assert(cblock_->GetStrongCounter() >= 2);
     }
 
     SharedPtr& operator=(const SharedPtr& other){
+        if(this == &other){
+            return *this;
+        }
         SharedPtr tmp(other);
         swap(tmp);
+        return *this;
     }
 
     template<typename U>
     SharedPtr& operator=(const SharedPtr<U>& other){
+        if(this == &other){
+            return *this;
+        }
         SharedPtr tmp(other);
         swap(tmp);
+        return *this;
     }
 
     ~SharedPtr(){
@@ -82,6 +112,18 @@ public:
     SharedPtr(Y* data, Deleter dltr) : data_(data), cblock_(new TypedControlBlock{1,0, data, dltr}) {}
 
     SharedPtr(std::nullptr_t) {}
+    
+    template<typename Deleter>
+    SharedPtr(std::nullptr_t, Deleter dltr) : cblock_(new TypedControlBlock{1,0, static_cast<T*>(nullptr), dltr}) {}
+
+    template<typename Y> 
+    SharedPtr(const SharedPtr<Y>& r, element_type* ptr) noexcept : data_(ptr), cblock_(r.cblock_) {
+        if(!cblock_){
+            return;
+        }
+
+        cblock_->IncreaseStrong();
+    }
 
     SharedPtr() {}
 

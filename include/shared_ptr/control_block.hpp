@@ -64,7 +64,7 @@ public:
     TypedControlBlock(std::size_t weak_cnt, std::size_t strong_cnt, T* data, Deleter dltr) : ControlBlock(weak_cnt, strong_cnt), data_(data), dltr_(std::move(dltr)) {}
 
     void DestroyObject() override {
-        delete data_;
+        dltr_(data_);
     }
 
 };
