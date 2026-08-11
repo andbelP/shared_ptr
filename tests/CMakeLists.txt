@@ -21,7 +21,7 @@ add_executable(shared_ptr_tests
 #  aliasing_and_inheritance_test.cpp
 #  allocator_test.cpp
 #  arrays_test.cpp
-#  assignment_test.cpp
+  assignment_test.cpp
 #  casts_test.cpp
 #  comparisons_and_ownership_test.cpp
 #  constructors_test.cpp

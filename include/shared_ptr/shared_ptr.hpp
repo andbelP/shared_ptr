@@ -69,6 +69,15 @@ public:
         assert(cblock_->GetStrongCounter() >= 2);
     }
 
+    SharedPtr(SharedPtr&& other){
+        swap(other);
+    }
+
+    template<typename U>
+    SharedPtr(SharedPtr<U>&& other){
+        swap(other);
+    }
+
     template<typename U>
     SharedPtr(const SharedPtr<U>& other) : data_(other.data_), cblock_(other.cblock_) {
         if(!other.cblock_){
@@ -88,6 +97,28 @@ public:
         swap(tmp);
         return *this;
     }
+
+    // SharedPtr& operator=(SharedPtr&& other){
+        
+    //     if(cblock_){
+    //         cblock_->DecreaseStrong();
+    //     }
+    //     cblock_=nullptr;
+    //     data_=nullptr;
+
+    //     swap(other);
+    // }
+
+    // template<typename U>
+    // SharedPtr& operator=(SharedPtr<U>&& other){
+    //     if(cblock_){
+    //         cblock_->DecreaseStrong();
+    //     }
+    //     cblock_=nullptr;
+    //     data_=nullptr;
+
+    //     swap(other);
+    // }
 
     template<typename U>
     SharedPtr& operator=(const SharedPtr<U>& other){
