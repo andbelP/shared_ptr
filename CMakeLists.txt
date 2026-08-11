@@ -10,6 +10,11 @@ target_sources(shared_ptr
     FILES 
         include/shared_ptr/weak_ptr.hpp
         include/shared_ptr/shared_ptr.hpp
-        include/shared_ptr/control_block.hpp
 )
 
+option(BUILD_TESTING "Build tests for shared_ptr" ON)
+
+if(BUILD_TESTING)
+    enable_testing()
+    add_subdirectory(tests)
+endif()

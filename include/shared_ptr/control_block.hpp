@@ -10,11 +10,18 @@ protected:
 
     ControlBlock(std::size_t strong_cnt, std::size_t weak_cnt) : strong_cnt_(strong_cnt), weak_cnt_(weak_cnt) {}
 
-public:
-
     virtual void DestroyObject() = 0;
 
-    virtual ~ControlBlock() = default;
+
+public:
+
+    std::size_t GetStrongCounter() {
+        return strong_cnt_;
+    }
+
+    std::size_t GetWeakCounter() {
+        return weak_cnt_;
+    }
 
     void IncreaseStrong() { ++strong_cnt_; }
 
@@ -42,16 +49,19 @@ public:
         }
     }
 
+    virtual ~ControlBlock() = default;
+
 };
 
-template<typename T>
+template<typename T, typename Deleter>
 class TypedControlBlock : public ControlBlock{
 
     T* data_;
+    Deleter dltr_;
 
 public:
 
-    TypedControlBlock(std::size_t weak_cnt, std::size_t strong_cnt, T* data) : ControlBlock(weak_cnt, strong_cnt), data_(data) {}
+    TypedControlBlock(std::size_t weak_cnt, std::size_t strong_cnt, T* data, Deleter dltr) : ControlBlock(weak_cnt, strong_cnt), data_(data), dltr_(std::move(dltr)) {}
 
     void DestroyObject() override {
         delete data_;
