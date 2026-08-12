@@ -10,6 +10,10 @@ target_sources(shared_ptr
     FILES 
         include/shared_ptr/weak_ptr.hpp
         include/shared_ptr/shared_ptr.hpp
+        include/shared_ptr/shared_ptr_constructors.hpp
+        include/shared_ptr/shared_ptr_operators.hpp
+        include/shared_ptr/shared_ptr_modifiers.hpp
+        include/shared_ptr/shared_ptr_observers.hpp
 )
 
 option(BUILD_TESTING "Build tests for shared_ptr" ON)

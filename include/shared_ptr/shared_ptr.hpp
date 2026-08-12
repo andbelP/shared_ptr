@@ -1,6 +1,8 @@
 #pragma once
 
+#include <cstddef>
 #include <type_traits>
+#include <utility>
 
 #include "control_block.hpp"
 #include "default_deleter.hpp"
@@ -16,146 +18,61 @@ class SharedPtr {
 
 public:
 
-    using element_type = std::remove_extent_t<T>;
+    using element_type = T;
+    static_assert(!std::is_array_v<T>); // arrays support will be developed later
 
-    T* get() {
-        return data_;
-    }
+    SharedPtr() noexcept;
+    SharedPtr(std::nullptr_t) noexcept;
+    SharedPtr(const SharedPtr& other);
+    SharedPtr(SharedPtr&& other) noexcept;
 
-    std::size_t use_count() const noexcept {
-        if(cblock_){
-            return cblock_->GetStrongCounter();
-        }
-        return 0;
-    }
+    template<typename U> requires std::is_convertible_v<U*, T*>
+    SharedPtr(const SharedPtr<U>& other);
 
-    T& operator*() const noexcept{
-        return *data_;
-    }
+    template<typename U> requires std::is_convertible_v<U*, T*>
+    SharedPtr(SharedPtr<U>&& other) noexcept;
 
-    T* operator->() const noexcept{
-        return data_;
-    }
+    template<typename Y> requires std::is_convertible_v<Y*, T*>
+    explicit SharedPtr(Y* data);
 
-    void swap(SharedPtr& other) noexcept {
-        std::swap(data_, other.data_);
-        std::swap(cblock_, other.cblock_);
-    }
+    template<typename Y, typename Deleter> requires std::is_convertible_v<Y*, T*>
+    SharedPtr(Y* data, Deleter dltr);
 
-    void reset() noexcept {
-        SharedPtr tmp;
-        swap(tmp);
-    }
-
-    template<typename U>
-    void reset(U* ptr) noexcept {
-        SharedPtr tmp(ptr);
-        swap(tmp);
-    }
-
-    template<typename U, typename Deleter>
-    void reset(U* ptr, Deleter dltr) noexcept {
-        SharedPtr tmp(ptr, dltr);
-        swap(tmp);
-    }
-
-    SharedPtr(const SharedPtr& other) : data_(other.data_), cblock_(other.cblock_) {
-        if(!other.cblock_){
-            return;
-        }
-
-        cblock_->IncreaseStrong();
-
-        assert(cblock_->GetStrongCounter() >= 2);
-    }
-
-    SharedPtr(SharedPtr&& other){
-        swap(other);
-    }
-
-    template<typename U>
-    SharedPtr(SharedPtr<U>&& other){
-        swap(other);
-    }
-
-    template<typename U>
-    SharedPtr(const SharedPtr<U>& other) : data_(other.data_), cblock_(other.cblock_) {
-        if(!other.cblock_){
-            return;
-        }
-
-        cblock_->IncreaseStrong();
-
-        assert(cblock_->GetStrongCounter() >= 2);
-    }
-
-    SharedPtr& operator=(const SharedPtr& other){
-        if(this == &other){
-            return *this;
-        }
-        SharedPtr tmp(other);
-        swap(tmp);
-        return *this;
-    }
-
-    // SharedPtr& operator=(SharedPtr&& other){
-        
-    //     if(cblock_){
-    //         cblock_->DecreaseStrong();
-    //     }
-    //     cblock_=nullptr;
-    //     data_=nullptr;
-
-    //     swap(other);
-    // }
-
-    // template<typename U>
-    // SharedPtr& operator=(SharedPtr<U>&& other){
-    //     if(cblock_){
-    //         cblock_->DecreaseStrong();
-    //     }
-    //     cblock_=nullptr;
-    //     data_=nullptr;
-
-    //     swap(other);
-    // }
-
-    template<typename U>
-    SharedPtr& operator=(const SharedPtr<U>& other){
-        if(this == &other){
-            return *this;
-        }
-        SharedPtr tmp(other);
-        swap(tmp);
-        return *this;
-    }
-
-    ~SharedPtr(){
-        if(cblock_){
-            cblock_->DecreaseStrong();
-        }
-    }
+    template<typename Deleter>
+    SharedPtr(std::nullptr_t, Deleter dltr);
 
     template<typename Y>
-    SharedPtr(Y* data) : data_(data), cblock_(new TypedControlBlock{1,0, data, DefaultDeleter<Y>{}}) {}
+    SharedPtr(const SharedPtr<Y>& r, element_type* ptr) noexcept;
 
-    template<typename Y, typename Deleter>
-    SharedPtr(Y* data, Deleter dltr) : data_(data), cblock_(new TypedControlBlock{1,0, data, dltr}) {}
+    ~SharedPtr();
 
-    SharedPtr(std::nullptr_t) {}
-    
-    template<typename Deleter>
-    SharedPtr(std::nullptr_t, Deleter dltr) : cblock_(new TypedControlBlock{1,0, static_cast<T*>(nullptr), dltr}) {}
+    SharedPtr& operator=(const SharedPtr& other);
+    SharedPtr& operator=(SharedPtr&& other) noexcept;
 
-    template<typename Y> 
-    SharedPtr(const SharedPtr<Y>& r, element_type* ptr) noexcept : data_(ptr), cblock_(r.cblock_) {
-        if(!cblock_){
-            return;
-        }
+    template<typename U> requires std::is_convertible_v<U*, T*>
+    SharedPtr& operator=(const SharedPtr<U>& other);
 
-        cblock_->IncreaseStrong();
-    }
+    template<typename U> requires std::is_convertible_v<U*, T*>
+    SharedPtr& operator=(SharedPtr<U>&& other) noexcept;
 
-    SharedPtr() {}
+    T& operator*() const noexcept;
+    T* operator->() const noexcept;
 
+    void swap(SharedPtr& other) noexcept;
+    void reset() noexcept;
+
+    template<typename U> requires std::is_convertible_v<U*, T*>
+    void reset(U* ptr);
+
+    template<typename U, typename Deleter> requires std::is_convertible_v<U*, T*>
+    void reset(U* ptr, Deleter dltr);
+
+    T* get() const noexcept;
+    std::size_t use_count() const noexcept;
 };
+
+
+#include "shared_ptr_constructors.hpp"
+#include "shared_ptr_operators.hpp"
+#include "shared_ptr_modifiers.hpp"
+#include "shared_ptr_observers.hpp"
