@@ -75,3 +75,12 @@ SharedPtr<T>::~SharedPtr() {
         cblock_->DecreaseStrong();
     }
 }
+
+template<typename T>
+template<typename Y, typename Deleter> requires std::is_convertible_v<Y*, T*>
+SharedPtr<T>::SharedPtr(std::unique_ptr<Y, Deleter>&& other){
+    Y* ptr = other.get();
+    cblock_ = new TypedControlBlock{1, 0, ptr, other.get_deleter()};
+    data_ = ptr;
+    other.release();
+}

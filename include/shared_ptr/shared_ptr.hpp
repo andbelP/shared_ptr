@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cstddef>
+#include <functional>
+#include <memory>
 #include <type_traits>
 #include <utility>
 
@@ -44,6 +46,9 @@ public:
     template<typename Y>
     SharedPtr(const SharedPtr<Y>& r, element_type* ptr) noexcept;
 
+    template<typename Y, typename Deleter> requires std::is_convertible_v<Y*, T*>
+    SharedPtr(std::unique_ptr<Y, Deleter>&& ptr);
+
     ~SharedPtr();
 
     SharedPtr& operator=(const SharedPtr& other);
@@ -58,6 +63,8 @@ public:
     T& operator*() const noexcept;
     T* operator->() const noexcept;
 
+    explicit operator bool() const noexcept;
+
     void swap(SharedPtr& other) noexcept;
     void reset() noexcept;
 
@@ -69,6 +76,10 @@ public:
 
     T* get() const noexcept;
     std::size_t use_count() const noexcept;
+
+    template<typename U>
+    bool owner_before(const SharedPtr<U>& other) const noexcept;
+    // TODO:: add owner_before for WeakPtr
 };
 
 

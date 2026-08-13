@@ -43,3 +43,28 @@ template<typename T>
 T* SharedPtr<T>::operator->() const noexcept {
     return data_;
 }
+
+template<typename T>
+SharedPtr<T>::operator bool() const noexcept{
+    return static_cast<bool>(data_);
+}
+
+template<typename T, typename U>
+bool operator==(const SharedPtr<T>& lhs, const SharedPtr<U>& rhs) noexcept {
+    return lhs.get() == rhs.get();
+}
+
+template<typename T>
+bool operator==(const SharedPtr<T>& lhs, std::nullptr_t) noexcept {
+    return lhs.get() ==nullptr;
+}
+
+template<typename U>
+bool operator==(std::nullptr_t, const SharedPtr<U>& rhs) noexcept {
+    return nullptr == rhs.get();
+}
+
+template<typename T, typename U>
+auto operator<=>(const SharedPtr<T>& lhs, const SharedPtr<U>& rhs) noexcept {
+    return std::compare_three_way{}(lhs.get(), rhs.get());
+}
