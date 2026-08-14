@@ -15,6 +15,8 @@ protected:
 
 public:
 
+    virtual void* GetDeleter() noexcept = 0;
+
     std::size_t GetStrongCounter() {
         return strong_cnt_;
     }
@@ -65,6 +67,10 @@ public:
 
     void DestroyObject() override {
         dltr_(data_);
+    }
+
+    void* GetDeleter() noexcept override {
+        return &dltr_;
     }
 
 };

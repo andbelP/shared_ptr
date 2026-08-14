@@ -43,3 +43,15 @@ template<typename T, typename U>
 SharedPtr<T> const_pointer_cast(const SharedPtr<U>& ptr) noexcept{
     return SharedPtr<T>(ptr, const_cast<SharedPtr<T>::element_type*>(ptr.get()));
 }  
+
+template<class Deleter, class T >
+Deleter* get_deleter( const SharedPtr<T>& p ) noexcept {
+    return reinterpret_cast<Deleter*>(p.cblock_.GetDeleter());
+}
+
+template<typename T>
+struct std::hash<SharedPtr<T>>{
+    std::size_t operator()(const SharedPtr<T>& ptr) const noexcept{
+        return std::hash<typename SharedPtr<T>::element_type*>{}(ptr.get());
+    }
+};
