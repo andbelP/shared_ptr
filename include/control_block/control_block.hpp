@@ -17,6 +17,8 @@ public:
 
     virtual void* GetDeleter() noexcept = 0;
 
+    virtual const std::type_info& GetDeleterTypeInfo() noexcept = 0;
+
     std::size_t GetStrongCounter() {
         return strong_cnt_;
     }
@@ -71,6 +73,10 @@ public:
 
     void* GetDeleter() noexcept override {
         return &dltr_;
+    }
+
+    const std::type_info& GetDeleterTypeInfo() noexcept override {
+        return typeid(Deleter);
     }
 
 };

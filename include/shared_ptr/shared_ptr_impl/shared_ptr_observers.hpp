@@ -7,7 +7,7 @@ T* SharedPtr<T>::get() const noexcept {
 }
 
 template<typename T>
-std::size_t SharedPtr<T>::use_count() const noexcept {
+long SharedPtr<T>::use_count() const noexcept {
     if(cblock_){
         return cblock_->GetStrongCounter();
     }
@@ -46,7 +46,10 @@ SharedPtr<T> const_pointer_cast(const SharedPtr<U>& ptr) noexcept{
 
 template<class Deleter, class T >
 Deleter* get_deleter( const SharedPtr<T>& p ) noexcept {
-    return reinterpret_cast<Deleter*>(p.cblock_.GetDeleter());
+    if(p.cblock_ && typeid(Deleter) == p.cblock_->GetDeleterTypeInfo()){
+        return reinterpret_cast<Deleter*>(p.cblock_->GetDeleter());
+    }
+    return nullptr;
 }
 
 template<typename T>

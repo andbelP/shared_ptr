@@ -46,7 +46,7 @@ SharedPtr<T>::SharedPtr(SharedPtr<U>&& other) noexcept
 template<typename T>
 template<typename Y> requires std::is_convertible_v<Y*, T*>
 SharedPtr<T>::SharedPtr(Y* data)
-    : data_(data), cblock_(new TypedControlBlock{1, 0, data, DefaultDeleter<Y>{}}) {}
+    : data_(data), cblock_(new TypedControlBlock{1, 0, data, std::default_delete<Y>{}}) {}
 
 template<typename T>
 template<typename Y, typename Deleter> requires std::is_convertible_v<Y*, T*>

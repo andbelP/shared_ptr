@@ -68,3 +68,11 @@ template<typename T, typename U>
 auto operator<=>(const SharedPtr<T>& lhs, const SharedPtr<U>& rhs) noexcept {
     return std::compare_three_way{}(lhs.get(), rhs.get());
 }
+
+
+template<typename T>
+std::ostream& operator<<(std::ostream& stream, const SharedPtr<T>& ptr) noexcept {
+    stream << ptr.get();
+    return stream;
+}
+

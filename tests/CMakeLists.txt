@@ -28,7 +28,7 @@ add_executable(shared_ptr_tests
   custom_deleter_test.cpp
   lifetime_test.cpp
   modifiers_test.cpp
-#  observers_test.cpp
+  observers_test.cpp
 #  thread_safety_test.cpp
 #  weak_interop_test.cpp
 )

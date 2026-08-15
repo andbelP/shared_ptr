@@ -6,8 +6,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "control_block.hpp"
-#include "default_deleter.hpp"
+#include "../control_block/control_block.hpp"
 
 
 template<typename T>
@@ -17,6 +16,12 @@ class SharedPtr {
 
     template<typename U>
     friend class SharedPtr;
+
+    template<typename U>
+    friend class WeakPtr;
+
+    template<class Deleter, class U >
+    friend Deleter* get_deleter( const SharedPtr<U>& p ) noexcept;
 
 public:
 
@@ -75,7 +80,7 @@ public:
     void reset(U* ptr, Deleter dltr);
 
     T* get() const noexcept;
-    std::size_t use_count() const noexcept;
+    long use_count() const noexcept;
 
     template<typename U>
     bool owner_before(const SharedPtr<U>& other) const noexcept;
@@ -83,7 +88,7 @@ public:
 };
 
 
-#include "shared_ptr_constructors.hpp"
-#include "shared_ptr_operators.hpp"
-#include "shared_ptr_modifiers.hpp"
-#include "shared_ptr_observers.hpp"
+#include "shared_ptr_impl/shared_ptr_constructors.hpp"
+#include "shared_ptr_impl/shared_ptr_operators.hpp"
+#include "shared_ptr_impl/shared_ptr_modifiers.hpp"
+#include "shared_ptr_impl/shared_ptr_observers.hpp"
