@@ -8,6 +8,8 @@
 
 #include "../control_block/control_block.hpp"
 
+template<typename T>
+class WeakPtr;
 
 template<typename T>
 class SharedPtr {
@@ -84,7 +86,9 @@ public:
 
     template<typename U>
     bool owner_before(const SharedPtr<U>& other) const noexcept;
-    // TODO:: add owner_before for WeakPtr
+
+    template<typename U>
+    bool owner_before(const WeakPtr<U>& other) const noexcept;
 };
 
 

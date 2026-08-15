@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../weak_ptr.hpp"
 
 template<typename T>
 T* SharedPtr<T>::get() const noexcept {
@@ -17,6 +18,12 @@ long SharedPtr<T>::use_count() const noexcept {
 template<typename T>
 template<typename U>
 bool SharedPtr<T>::owner_before(const SharedPtr<U>& other) const noexcept {
+    return std::less<ControlBlock*>{}(cblock_, other.cblock_);
+}
+
+template<typename T>
+template<typename U>
+bool SharedPtr<T>::owner_before(const WeakPtr<U>& other) const noexcept {
     return std::less<ControlBlock*>{}(cblock_, other.cblock_);
 }
 
