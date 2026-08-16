@@ -6,6 +6,7 @@
 
 template<typename T>
 class WeakPtr{
+    T* data_;
     ControlBlock* cblock_{};
 
     template<typename U>
@@ -53,6 +54,12 @@ public:
 
     template<typename U>
     bool owner_before(const WeakPtr<U>& other) const noexcept;
+
+    long use_count() const noexcept;
+
+    bool expired() const noexcept;
+
+    SharedPtr<T> lock() const noexcept;
 
 };
 

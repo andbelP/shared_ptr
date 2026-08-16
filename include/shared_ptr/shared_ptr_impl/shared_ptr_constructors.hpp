@@ -92,8 +92,8 @@ SharedPtr<T>::SharedPtr(const WeakPtr<Y>& r){
         throw std::bad_weak_ptr{};
     }
 
-    data_=reinterpret_cast<T*>(r.cblock_->GetStoredPointer());
-    cblock_=r.cblock_;
+    data_ = static_cast<T*>(r.data_);
+    cblock_ = r.cblock_;
     cblock_->IncreaseStrong();
     
 }
