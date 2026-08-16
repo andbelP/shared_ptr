@@ -84,3 +84,16 @@ SharedPtr<T>::SharedPtr(std::unique_ptr<Y, Deleter>&& other){
     data_ = ptr;
     other.release();
 }
+
+template<typename T>
+template<typename Y> requires std::is_convertible_v<Y*, T*>
+SharedPtr<T>::SharedPtr(const WeakPtr<Y>& r){
+    if(!r.cblock_ || r.cblock_->GetStrongCounter() == 0){
+        throw std::bad_weak_ptr{};
+    }
+
+    data_=reinterpret_cast<T*>(r.cblock_->GetStoredPointer());
+    cblock_=r.cblock_;
+    cblock_->IncreaseStrong();
+    
+}

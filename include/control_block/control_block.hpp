@@ -53,6 +53,8 @@ public:
         }
     }
 
+    virtual void* GetStoredPointer() const noexcept = 0;
+
     virtual ~ControlBlock() = default;
 
 };
@@ -66,6 +68,10 @@ class TypedControlBlock : public ControlBlock{
 public:
 
     TypedControlBlock(std::size_t weak_cnt, std::size_t strong_cnt, T* data, Deleter dltr) : ControlBlock(weak_cnt, strong_cnt), data_(data), dltr_(std::move(dltr)) {}
+
+    void* GetStoredPointer() const noexcept override {
+        return reinterpret_cast<void*>(data_);
+    }
 
     void DestroyObject() override {
         dltr_(data_);

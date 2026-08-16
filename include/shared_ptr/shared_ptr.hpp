@@ -30,6 +30,8 @@ public:
     using element_type = T;
     static_assert(!std::is_array_v<T>); // arrays support will be developed later
 
+    using weak_type = WeakPtr<T>;
+
     SharedPtr() noexcept;
     SharedPtr(std::nullptr_t) noexcept;
     SharedPtr(const SharedPtr& other);
@@ -55,6 +57,9 @@ public:
 
     template<typename Y, typename Deleter> requires std::is_convertible_v<Y*, T*>
     SharedPtr(std::unique_ptr<Y, Deleter>&& ptr);
+
+    template<typename Y> requires std::is_convertible_v<Y*, T*>
+    explicit SharedPtr(const WeakPtr<Y>& r);
 
     ~SharedPtr();
 

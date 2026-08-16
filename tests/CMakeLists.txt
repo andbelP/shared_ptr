@@ -17,7 +17,7 @@ enable_testing()
 find_package(Threads REQUIRED)
 
 add_executable(shared_ptr_tests
-#  advanced_types_test.cpp
+# advanced_types_test.cpp
   aliasing_and_inheritance_test.cpp
 #  allocator_test.cpp
 #  arrays_test.cpp
@@ -30,7 +30,7 @@ add_executable(shared_ptr_tests
   modifiers_test.cpp
   observers_test.cpp
 #  thread_safety_test.cpp
-#  weak_interop_test.cpp
+  weak_interop_test.cpp
 )
 
 target_compile_features(shared_ptr_tests PRIVATE cxx_std_20)
