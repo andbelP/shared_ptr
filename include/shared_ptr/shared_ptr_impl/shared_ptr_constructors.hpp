@@ -70,6 +70,14 @@ SharedPtr<T>::SharedPtr(const SharedPtr<Y>& r, element_type* ptr) noexcept
 }
 
 template<typename T>
+template<typename Y>
+SharedPtr<T>::SharedPtr(SharedPtr<Y>&& r, element_type* ptr) noexcept
+    : data_(ptr), cblock_(r.cblock_) {
+    SharedPtr<Y> tmp{};
+    tmp.swap(r);
+}
+
+template<typename T>
 SharedPtr<T>::~SharedPtr() {
     if(cblock_){
         cblock_->DecreaseStrong();
@@ -92,8 +100,8 @@ SharedPtr<T>::SharedPtr(const WeakPtr<Y>& r){
         throw std::bad_weak_ptr{};
     }
 
-    data_ = static_cast<T*>(r.data_);
-    cblock_ = r.cblock_;
+    data_=r.data_;
+    cblock_=r.cblock_;
     cblock_->IncreaseStrong();
     
 }

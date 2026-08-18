@@ -33,6 +33,8 @@ WeakPtr<T>& WeakPtr<T>::operator=(WeakPtr<U>&& other) noexcept {
     WeakPtr tmp{};
     swap(tmp);
     cblock_ = other.cblock_;
+    data_=other.data_;
+    other.data_=nullptr;
     other.cblock_ = nullptr;
     return *this;
 }
@@ -45,6 +47,8 @@ WeakPtr<T>& WeakPtr<T>::operator=(WeakPtr&& other) noexcept {
     WeakPtr tmp{};
     swap(tmp);
     cblock_ = other.cblock_;
+    data_=other.data_;
+    other.data_=nullptr;
     other.cblock_ = nullptr;
     return *this;
 }

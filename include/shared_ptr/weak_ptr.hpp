@@ -61,6 +61,8 @@ public:
 
     SharedPtr<T> lock() const noexcept;
 
+    void reset() noexcept;
+
 };
 
 

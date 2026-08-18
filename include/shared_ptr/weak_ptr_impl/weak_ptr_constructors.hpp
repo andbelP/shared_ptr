@@ -3,14 +3,14 @@
 
 template<typename T>
 template<typename U> requires std::is_convertible_v<U*, T*>
-WeakPtr<T>::WeakPtr(const SharedPtr<U>& ptr) noexcept : cblock_(ptr.cblock_), data_(ptr.data_) {
+WeakPtr<T>::WeakPtr(const SharedPtr<U>& ptr) noexcept : data_(ptr.data_), cblock_(ptr.cblock_) {
     if(cblock_){
         cblock_->IncreaseWeak();
     }
 }
 
 template<typename T>
-WeakPtr<T>::WeakPtr(const WeakPtr& other) noexcept : cblock_(other.cblock_), data_(other.data_) {
+WeakPtr<T>::WeakPtr(const WeakPtr& other) noexcept : data_(other.data_), cblock_(other.cblock_) {
     if(cblock_){
         cblock_->IncreaseWeak();
     }
@@ -18,7 +18,7 @@ WeakPtr<T>::WeakPtr(const WeakPtr& other) noexcept : cblock_(other.cblock_), dat
 
 template<typename T>
 template<typename U> requires std::is_convertible_v<U*, T*>
-WeakPtr<T>::WeakPtr(const WeakPtr<U>& other) noexcept : cblock_(other.cblock_), data_(other.data_) {
+WeakPtr<T>::WeakPtr(const WeakPtr<U>& other) noexcept : data_(other.data_), cblock_(other.cblock_) {
     if(cblock_){
         cblock_->IncreaseWeak();
     }
@@ -26,19 +26,19 @@ WeakPtr<T>::WeakPtr(const WeakPtr<U>& other) noexcept : cblock_(other.cblock_), 
 
 template<typename T>
 WeakPtr<T>::WeakPtr(WeakPtr&& other) noexcept {
+    data_=other.data_;
     cblock_ = other.cblock_;
-    data_ = other.data_;
     other.cblock_ = nullptr;
-    other.data_ = nullptr;
+    other.data_=nullptr;
 }
 
 template<typename T>
 template<typename U> requires std::is_convertible_v<U*, T*>
 WeakPtr<T>::WeakPtr(WeakPtr<U>&& other) noexcept {
+    data_=other.data_;
     cblock_ = other.cblock_;
-    data_ = other.data_;
     other.cblock_ = nullptr;
-    other.data_ = nullptr;
+    other.data_=nullptr;
 }
 
 template<typename T>

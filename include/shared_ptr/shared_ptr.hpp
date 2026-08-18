@@ -55,6 +55,9 @@ public:
     template<typename Y>
     SharedPtr(const SharedPtr<Y>& r, element_type* ptr) noexcept;
 
+    template<typename Y>
+    SharedPtr(SharedPtr<Y>&& r, element_type* ptr) noexcept;
+
     template<typename Y, typename Deleter> requires std::is_convertible_v<Y*, T*>
     SharedPtr(std::unique_ptr<Y, Deleter>&& ptr);
 
