@@ -1,18 +1,8 @@
 #pragma once
 
-#include <cstddef>
-#include <functional>
-#include <memory>
-#include <type_traits>
-#include <utility>
-
-#include "../control_block/control_block.hpp"
 
 template<typename T>
-class WeakPtr;
-
-template<typename T>
-class SharedPtr {
+class SharedPtr<T[]> {
     T* data_{};
     ControlBlock* cblock_{};
 
@@ -28,20 +18,19 @@ class SharedPtr {
 public:
 
     using element_type = T;
-    static_assert(!std::is_array_v<T>); // arrays support will be developed later
 
-    using weak_type = WeakPtr<T>;
+    using weak_type = WeakPtr<T[]>;
 
     SharedPtr() noexcept;
     SharedPtr(std::nullptr_t) noexcept;
     SharedPtr(const SharedPtr& other);
     SharedPtr(SharedPtr&& other) noexcept;
 
-    template<typename U> requires std::is_convertible_v<U*, T*>
-    SharedPtr(const SharedPtr<U>& other);
+    template<typename U> requires std::is_convertible_v<U(*)[], T(*)[]>
+    SharedPtr(const SharedPtr<U[]>& other);
 
-    template<typename U> requires std::is_convertible_v<U*, T*>
-    SharedPtr(SharedPtr<U>&& other) noexcept;
+    template<typename U> requires std::is_convertible_v<U(*)[], T(*)[]>
+    SharedPtr(SharedPtr<U[]>&& other) noexcept;
 
     template<typename Y> requires std::is_convertible_v<Y*, T*>
     explicit SharedPtr(Y* data);
@@ -59,34 +48,33 @@ public:
     SharedPtr(SharedPtr<Y>&& r, element_type* ptr) noexcept;
 
     template<typename Y, typename Deleter> requires std::is_convertible_v<Y*, T*>
-    SharedPtr(std::unique_ptr<Y, Deleter>&& ptr);
+    SharedPtr(std::unique_ptr<Y[], Deleter>&& ptr);
 
     template<typename Y> requires std::is_convertible_v<Y*, T*>
-    explicit SharedPtr(const WeakPtr<Y>& r);
+    explicit SharedPtr(const WeakPtr<Y[]>& r);
 
     ~SharedPtr();
 
     SharedPtr& operator=(const SharedPtr& other);
     SharedPtr& operator=(SharedPtr&& other) noexcept;
 
-    template<typename U> requires std::is_convertible_v<U*, T*>
-    SharedPtr& operator=(const SharedPtr<U>& other);
+    template<typename U> requires std::is_convertible_v<U(*)[], T(*)[]>
+    SharedPtr& operator=(const SharedPtr<U[]>& other);
 
-    template<typename U> requires std::is_convertible_v<U*, T*>
-    SharedPtr& operator=(SharedPtr<U>&& other) noexcept;
+    template<typename U> requires std::is_convertible_v<U(*)[], T(*)[]>
+    SharedPtr& operator=(SharedPtr<U[]>&& other) noexcept;
 
-    T& operator*() const noexcept;
-    T* operator->() const noexcept;
+    T& operator[](std::size_t index) const noexcept;
 
     explicit operator bool() const noexcept;
 
     void swap(SharedPtr& other) noexcept;
     void reset() noexcept;
 
-    template<typename U> requires std::is_convertible_v<U*, T*>
+    template<typename U> requires std::is_convertible_v<U(*)[], T(*)[]>
     void reset(U* ptr);
 
-    template<typename U, typename Deleter> requires std::is_convertible_v<U*, T*>
+    template<typename U, typename Deleter> requires std::is_convertible_v<U(*)[], T(*)[]>
     void reset(U* ptr, Deleter dltr);
 
     T* get() const noexcept;
@@ -100,9 +88,7 @@ public:
 };
 
 
-#include "shared_ptr_impl/shared_ptr_constructors.hpp"
-#include "shared_ptr_impl/shared_ptr_operators.hpp"
-#include "shared_ptr_impl/shared_ptr_modifiers.hpp"
-#include "shared_ptr_impl/shared_ptr_observers.hpp"
-
-#include "specs/shared_ptr_arr.hpp"
+#include "../shared_ptr_arr_impl/shared_ptr_arr_constructors.hpp"
+#include "../shared_ptr_arr_impl/shared_ptr_arr_operators.hpp"
+#include "../shared_ptr_arr_impl/shared_ptr_arr_modifiers.hpp"
+#include "../shared_ptr_arr_impl/shared_ptr_arr_observers.hpp"
