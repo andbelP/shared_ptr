@@ -51,6 +51,34 @@ SharedPtr<T> const_pointer_cast(const SharedPtr<U>& ptr) noexcept{
     return SharedPtr<T>(ptr, const_cast<SharedPtr<T>::element_type*>(ptr.get()));
 }  
 
+// ---
+
+template<typename T, typename U>
+SharedPtr<T> static_pointer_cast(SharedPtr<U>&& ptr) noexcept{
+    return SharedPtr<T>(std::move(ptr), static_cast<SharedPtr<T>::element_type*>(ptr.get()));
+}  
+
+template<typename T, typename U>
+SharedPtr<T> dynamic_pointer_cast(SharedPtr<U>&& ptr) noexcept{
+    auto* casted_ptr = dynamic_cast<SharedPtr<T>::element_type*>(ptr.get());
+    if(casted_ptr){
+        return SharedPtr<T>(std::move(ptr), casted_ptr);
+    }
+    return SharedPtr<T>{};
+}
+
+template<typename T, typename U>
+SharedPtr<T> reinterpret_pointer_cast(SharedPtr<U>&& ptr) noexcept{
+    return SharedPtr<T>(std::move(ptr), reinterpret_cast<SharedPtr<T>::element_type*>(ptr.get()));
+}  
+
+template<typename T, typename U>
+SharedPtr<T> const_pointer_cast(SharedPtr<U>&& ptr) noexcept{
+    return SharedPtr<T>(std::move(ptr), const_cast<SharedPtr<T>::element_type*>(ptr.get()));
+}  
+
+// ---
+
 template<class Deleter, class T >
 Deleter* get_deleter( const SharedPtr<T>& p ) noexcept {
     if(p.cblock_ && typeid(Deleter) == p.cblock_->GetDeleterTypeInfo()){

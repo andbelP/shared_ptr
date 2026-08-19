@@ -73,8 +73,8 @@ template<typename T>
 template<typename Y>
 SharedPtr<T>::SharedPtr(SharedPtr<Y>&& r, element_type* ptr) noexcept
     : data_(ptr), cblock_(r.cblock_) {
-    SharedPtr<Y> tmp{};
-    tmp.swap(r);
+    r.data_=nullptr;
+    r.cblock_=nullptr;
 }
 
 template<typename T>
