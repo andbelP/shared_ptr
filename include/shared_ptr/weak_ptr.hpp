@@ -6,7 +6,7 @@
 
 template<typename T>
 class WeakPtr{
-    T* data_;
+    T* data_{};
     ControlBlock* cblock_{};
 
     template<typename U>

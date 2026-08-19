@@ -35,7 +35,8 @@ SharedPtr<T>& SharedPtr<T>::operator=(SharedPtr<U>&& other) noexcept {
 }
 
 template<typename T>
-T& SharedPtr<T>::operator*() const noexcept {
+std::add_lvalue_reference_t<T> SharedPtr<T>::operator*() const noexcept
+    requires (!std::is_void_v<T>) {
     return *data_;
 }
 
@@ -75,4 +76,3 @@ std::ostream& operator<<(std::ostream& stream, const SharedPtr<T>& ptr) noexcept
     stream << ptr.get();
     return stream;
 }
-

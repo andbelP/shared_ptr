@@ -4,6 +4,11 @@ namespace shared_ptr_tests {
 
 struct Incomplete;
 
+template<typename T>
+concept DereferenceableSharedPtr = requires(SharedPtr<T> pointer) {
+  *pointer;
+};
+
 TEST(SharedPtrIncompleteType, DefaultConstructionIsSupported) {
   SharedPtr<Incomplete> pointer;
   EXPECT_EQ(pointer.get(), nullptr);
@@ -45,6 +50,34 @@ TEST(SharedPtrVoid, ConvertsToConstVoid) {
 TEST(SharedPtrVoid, ElementTypeIsVoid) {
   static_assert(std::is_same_v<SharedPtr<void>::element_type, void>);
   static_assert(std::is_same_v<SharedPtr<const void>::element_type, const void>);
+}
+
+TEST(SharedPtrVoid, SupportsCopyMoveAndReset) {
+  SharedPtr<int> integer(new int(42));
+  SharedPtr<void> first(integer);
+  SharedPtr<void> second(first);
+  SharedPtr<const void> third(std::move(second));
+
+  EXPECT_EQ(first.use_count(), 3);
+  EXPECT_EQ(third.get(), static_cast<const void*>(integer.get()));
+  EXPECT_EQ(second.get(), nullptr);
+
+  first.reset();
+  EXPECT_EQ(third.use_count(), 2);
+}
+
+TEST(SharedPtrVoid, SupportsWeakPointerInterop) {
+  SharedPtr<int> integer(new int(42));
+  WeakPtr<const void> weak(integer);
+  SharedPtr<const void> erased(weak);
+
+  EXPECT_EQ(erased.get(), static_cast<const void*>(integer.get()));
+  EXPECT_EQ(erased.use_count(), 2);
+}
+
+TEST(SharedPtrVoid, CannotBeDereferenced) {
+  static_assert(!DereferenceableSharedPtr<void>);
+  static_assert(!DereferenceableSharedPtr<const void>);
 }
 
 inline int function_call_count = 0;

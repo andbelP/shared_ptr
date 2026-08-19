@@ -75,7 +75,8 @@ public:
     template<typename U> requires std::is_convertible_v<U*, T*>
     SharedPtr& operator=(SharedPtr<U>&& other) noexcept;
 
-    T& operator*() const noexcept;
+    std::add_lvalue_reference_t<T> operator*() const noexcept
+        requires (!std::is_void_v<T>);
     T* operator->() const noexcept;
 
     explicit operator bool() const noexcept;
